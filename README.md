@@ -112,6 +112,7 @@ The E2E test covers the following:
 4. **Fetch Users**: Retrieves a list of users when authenticated.
 5. **Update User**: Updates user details using JWT authentication.
 6. **Soft Delete User**: Soft deletes a user with authentication.
+6. **hard Delete User**: hard deletes a user with authentication (currently not in test).
 
 ---
 
