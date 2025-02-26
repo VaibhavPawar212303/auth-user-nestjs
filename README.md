@@ -115,56 +115,60 @@ $ npm run test:cov
   - Calls `authService.login(loginDto)`.
   - **Authentication:** No guard applied.
 
-![Alt text](./images/authlogin.png)
+![Login](./images/authlogin.png)
 
 ### User Controller (`src/users/users.controller.ts`)
 
 - **GET** `/users`  
   - Returns a list of users.
   - **Authentication:** Requires JWT (`@UseGuards(JwtAuthGuard)`).
- 
-  ![Alt text](./images/fetchuserwithtoke.png)
-  ![Alt text](./images/userfetchwithouttoken.png)
+  
+  ![Fetch User With Token](./images/fetchuserwithtoke.png)
+  ![Fetch User Without Token](./images/userfetchwithouttoken.png)
 
 - **POST** `/users`  
   - Accepts `CreateUserDto` payload.
   - Calls `userService.create(createUserDto)`.
   - **Authentication:** No guard applied.
 
-![Alt text](./images/createUser.png)
+![Create User](./images/createUser.png)
 
-
-  payload 
-   {
-  "first_name":"Vaibhav",
-  "last_name":"pawar",
-  "email":"vsp123@gmail.com",
-  "password":"vsp212303"
+**Payload:**
+```json
+{
+  "first_name": "Vaibhav",
+  "last_name": "Pawar",
+  "email": "vsp123@gmail.com",
+  "password": "vsp212303"
 }
+```
 
 - **PATCH** `/users/:id`  
   - Accepts `UpdateUserDto` payload.
   - Calls `userService.update(id, updateUserDto)`.
   - **Authentication:** Requires JWT (`@UseGuards(JwtAuthGuard)`).
 
-![Alt text](./images/updateuserwithtoke.png)
-![Alt text](./images/updateuser.png)
+![Update User With Token](./images/updateuserwithtoke.png)
+![Update User](./images/updateuser.png)
 
-  {
-"first_name": "Vaibha123"
+**Payload:**
+```json
+{
+  "first_name": "Vaibha123"
 }
+```
 
 - **DELETE** `/users/:id/soft`  
   - Soft deletes a user.
   - Calls `userService.softDelete(id)`.
   - **Authentication:** Requires JWT (`@UseGuards(JwtAuthGuard)`).
 
-![Alt text](./images/softdelete.png)
-
+![Soft Delete User](./images/softdelete.png)
 
 - **DELETE** `/users/:id/hard`  
   - Permanently deletes a user.
   - Calls `userService.hardDelete(id)`.
   - **Authentication:** Requires JWT (`@UseGuards(JwtAuthGuard)`).
 
-![Alt text](./images/harddelete.png)
+![Hard Delete User](./images/harddelete.png)
+
