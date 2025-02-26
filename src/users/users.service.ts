@@ -1,10 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import * as bcrypt from 'bcryptjs';
-import { IsNull } from 'typeorm'; 
 
 @Injectable()
 export class UserService {
@@ -17,9 +16,11 @@ export class UserService {
     const user = this.userRepository.create({ ...createUserDto, password: hashedPassword });
     return await this.userRepository.save(user);
   }
+
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({ where: { deleted_at: IsNull() } });
   }
+
   async findOne(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id, deleted_at: IsNull() }, 
@@ -29,6 +30,13 @@ export class UserService {
     }
     return user;
   }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return await this.userRepository.findOne({
+      where: { email, deleted_at: IsNull() },
+    });
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     await this.userRepository.update(id, updateUserDto);
     const updatedUser = await this.userRepository.findOne({
@@ -39,6 +47,7 @@ export class UserService {
     }
     return updatedUser;
   }
+
   async softDelete(id: number): Promise<void> {
     const user = await this.userRepository.findOne({
       where: { id },
@@ -48,6 +57,7 @@ export class UserService {
     }
     await this.userRepository.update(id, { deleted_at: new Date() });
   }
+
   async hardDelete(id: number): Promise<void> {
     const user = await this.userRepository.findOne({
       where: { id }, 

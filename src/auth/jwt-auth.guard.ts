@@ -1,24 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-jwt';
-import { ExtractJwt } from 'passport-jwt';
-import { UserService } from '../users/users.service';
 
 @Injectable()
-export class JwtAuthGuard extends PassportStrategy(Strategy) {
-  constructor(private jwtService: JwtService, private userService: UserService) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.JWT_SECRET, 
-    });
-  }
-
-  async validate(payload: any) {
-    const user = await this.userService.findOne(payload.sub);
-    if (!user) {
-      throw new Error('User not found');
+export class JwtAuthGuard implements CanActivate {
+  private readonly logger = new Logger(JwtAuthGuard.name);
+  constructor(private jwtService: JwtService) {}
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    const authHeader = request.headers.authorization;
+    this.logger.log(`Incoming Request: ${request.method} ${request.url}`); 
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      this.logger.warn('Authorization header missing or invalid');
+      return false;
     }
-    return user; 
+    const token = authHeader.split(' ')[1];
+    try {
+      const decoded = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
+      request.user = decoded;
+      return true;
+    } catch (error) {
+      this.logger.error(`JWT Verification Failed: ${error.message}`); // 🔹 Log JWT error
+      return false;
+    }
   }
 }

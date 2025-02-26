@@ -10,9 +10,10 @@ async function bootstrap() {
     .setDescription('API for managing users')
     .setVersion('1.0')
     .addTag('users')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document); // Swagger UI will be available at /api
+  SwaggerModule.setup('api', app, document); 
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

@@ -1,33 +1,44 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { UserService } from '../users/users.service';
+import { LoginDto } from './dto/login.dto';
+// import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
 import { User } from '../users/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
-    private jwtService: JwtService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
-  async login(email: string, password: string): Promise<any> {
-    const user = await this.userRepository.findOne({ where: { email } });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new Error('Invalid credentials');
+  async login(loginDto: LoginDto) {
+    const user = await this.userService.findByEmail(loginDto.email);
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
     }
-    const payload = { email: user.email, sub: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+
+    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const token = this.generateJwt(user);
+    return { access_token: token };
   }
 
-  async validateUser(payload: any): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id: payload.sub } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${payload.sub} not found`);
-    }
-    return user;
+  // async register(registerDto: RegisterDto): Promise<User> {
+  //   const existingUser = await this.userService.findByEmail(registerDto.email);
+  //   if (existingUser) {
+  //     throw new ConflictException('User with this email already exists');
+  //   }
+
+  //   return await this.userService.create(registerDto);
+  // }
+
+  generateJwt(user: User): string {
+    return jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET || 'secret_key',
+      { expiresIn: '1h' }
+    );
   }
 }
