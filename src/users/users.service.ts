@@ -23,7 +23,7 @@ export class UserService {
 
   async findOne(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
-      where: { id, deleted_at: IsNull() }, 
+      where: { id, deleted_at: IsNull() },
     });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -48,7 +48,7 @@ export class UserService {
     return updatedUser;
   }
 
-  async softDelete(id: number): Promise<void> {
+  async softDelete(id: number): Promise<string> {
     const user = await this.userRepository.findOne({
       where: { id },
     });
@@ -56,15 +56,17 @@ export class UserService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
     await this.userRepository.update(id, { deleted_at: new Date() });
+    return `User with ID ${id} has been successfully soft deleted`;
   }
 
-  async hardDelete(id: number): Promise<void> {
+  async hardDelete(id: number): Promise<string> {
     const user = await this.userRepository.findOne({
-      where: { id }, 
+      where: { id },
     });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
     await this.userRepository.delete(id);
+    return `User with ID ${id} has been successfully hard deleted`;
   }
 }
