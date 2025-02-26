@@ -104,6 +104,15 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+### End-to-End Test Details
+The E2E test covers the following:
+1. **User Creation**: Generates a unique email for each test run and creates a user.
+2. **User Login**: Logs in the created user and retrieves a JWT token.
+3. **Access Control**: Verifies that protected routes require authentication.
+4. **Fetch Users**: Retrieves a list of users when authenticated.
+5. **Update User**: Updates user details using JWT authentication.
+6. **Soft Delete User**: Soft deletes a user with authentication.
+
 ---
 
 ## 🔑 Authentication & User Management
