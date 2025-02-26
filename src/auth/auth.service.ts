@@ -15,24 +15,13 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
-
     const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
     }
-
     const token = this.generateJwt(user);
     return { access_token: token };
   }
-
-  // async register(registerDto: RegisterDto): Promise<User> {
-  //   const existingUser = await this.userService.findByEmail(registerDto.email);
-  //   if (existingUser) {
-  //     throw new ConflictException('User with this email already exists');
-  //   }
-
-  //   return await this.userService.create(registerDto);
-  // }
 
   generateJwt(user: User): string {
     return jwt.sign(
